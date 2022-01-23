@@ -1,2 +1,3 @@
 target_sources(${UNPACKER_EXE} PRIVATE
-  main.c)
+  main.c
+  sfx.c)
