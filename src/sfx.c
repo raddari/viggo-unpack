@@ -20,12 +20,10 @@
 
 #define READ_ONE(file, target) READ_N(file, target, 1)
 
-// FIXME(raddari): `typeof(target)` is not portable
 #define READ_FIELD_BE(file, target) \
     {                               \
-      typeof(target) buffer;        \
-      READ_ONE(file, &buffer);      \
-      target = ntohl(buffer);       \
+      READ_ONE(file, &target);      \
+      target = ntohl(target);       \
     }
 
 #define READ_FIELD(file, target) READ_FIELD_BE(file, target)
