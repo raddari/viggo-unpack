@@ -1,6 +1,6 @@
 #include "sfx.h"
 
-// TODO(raddari): `arpa/inet.h` is not portable
+// TODO(raddari): `arpa/inet.h` is not portable (#1)
 #include <arpa/inet.h>
 
 #define READ_N(file, target, n)                                      \
