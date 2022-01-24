@@ -62,26 +62,20 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
   READ_LE(sfx_file, elements);
   VagpAudio** container = malloc((elements + 1) * sizeof *container);
 
-  u32 *addresses = malloc(elements * sizeof *addresses);
-  u32 *sizes = malloc(elements * sizeof *sizes);
-  for (u32 i = 0; i < elements; i++) {
-    u32 next_address;
-    READ_LE(sfx_file, next_address);
-    addresses[i] = next_address;
-
-    u32 next_size;
-    READ_LE(sfx_file, next_size);
-    sizes[i] = next_size;
+  u32 *vagp_info = malloc(2 * elements * sizeof *vagp_info);
+  for (u32 i = 0; i < 2 * elements; i += 2) {
+    READ_LE(sfx_file, vagp_info[i]);
+    READ_LE(sfx_file, vagp_info[i + 1]);
   }
 
   fprintf(stderr, "Discovered %u addresses at:\n", elements);
-  for (u32 i = 0; i < elements; i++) {
-    fprintf(stderr, "addr=0x%.4X, size=0x%.4X\n", addresses[i], sizes[i]);
+  for (u32 i = 0; i < 2 * elements; i += 2) {
+    fprintf(stderr, "addr=0x%.4X, size=0x%.4X\n", vagp_info[i], vagp_info[i + 1]);
   }
 
-  // TODO(raddari): find a use for the address table
-  free(addresses);
-  addresses = NULL;
+  // TODO(raddari): find a use for the info table
+  free(vagp_info);
+  vagp_info = NULL;
 
   for (u32 i = 0; i < elements; i++) {
     VagpAudio *audio = malloc(sizeof *audio);
