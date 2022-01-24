@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO(raddari): `arpa/inet.h` is not portable (#1)
+// FIXME(raddari): `arpa/inet.h` is not portable (#1)
 #include <arpa/inet.h>
 
 #define READ_N(file, target, n)                                      \
@@ -25,12 +25,14 @@
 
 #define READ_ONE(file, target) READ_N(file, &target, 1)
 
+// FIXME(raddari): not portable (#2)
 #define READ_BE(file, target) \
     {                         \
       READ_ONE(file, target); \
       target = htonl(target); \
     }
 
+// FIXME(raddari): not portable (#2)
 #define READ_LE(file, target) READ_ONE(file, target)
 
 
