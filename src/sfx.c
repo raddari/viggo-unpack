@@ -18,11 +18,11 @@
 
 #define READ_ARRAY(file, target, n) READ_N(file, target, n)
 
-#define READ_ONE(file, target) READ_N(file, target, 1)
+#define READ_ONE(file, target) READ_N(file, &target, 1)
 
 #define READ_FIELD_BE(file, target) \
     {                               \
-      READ_ONE(file, &target);      \
+      READ_ONE(file, target);       \
       target = ntohl(target);       \
     }
 
