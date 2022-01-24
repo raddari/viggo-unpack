@@ -18,15 +18,24 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  fseek(file, 0x40, SEEK_SET);
-  AifHeader header = aif_header_from(file);
-  fclose(file);
+  VagpAudio** container = sfx_parse_container(file);
+  for (int i = 0; container[i] != NULL; i++) {
+    VagpAudio* audio = container[i];
+    print_header(&audio->header);
+    printf("\n");
+  }
+  sfx_container_destroy(container);
+  container = NULL;
 
-  print_header(&header);
+  fclose(file);
   return 0;
 }
 
 static void print_header(AifHeader *header) {
+  if (!header) {
+    return;
+  }
+
   printf("AifHeader{\n"
       "  magic=%s\n"
       "  version=%u\n"
