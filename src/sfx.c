@@ -145,6 +145,7 @@ static AifHeader parse_vagp_header(FILE *file) {
 
 static AifBlock* parse_aif_block(FILE *file) {
   AifBlock *block = malloc(sizeof *block);
+  block->next = NULL;
 
   READ_LE(file, block->coefficient);
   READ_LE(file, block->loop);
