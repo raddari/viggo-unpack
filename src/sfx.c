@@ -36,6 +36,7 @@
 #define READ_LE(file, target) READ_ONE(file, target)
 
 
+static bool has_next_block(AifBlock *block, AifHeader *header);
 static AifHeader parse_vagp_header(FILE *file);
 static AifBlock* parse_aif_block(FILE *file);
 
@@ -95,7 +96,7 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     AifBlock *block = parse_aif_block(sfx_file);
     audio->first = block;
 
-    while (memcmp(AIF_BLOCK_END, block, sizeof *block) != 0) {
+    while (has_next_block(block, &audio->header)) {
       AifBlock *next = parse_aif_block(sfx_file);
       block->next = next;
       block = next;
@@ -122,6 +123,10 @@ void sfx_container_destroy(VagpAudio **container) {
     container[i] = NULL;
   }
   free(container);
+}
+
+static bool has_next_block(AifBlock *block, AifHeader *header) {
+    return memcmp(AIF_BLOCK_END, block, sizeof *block) != 0;
 }
 
 static AifHeader parse_vagp_header(FILE *file) {
