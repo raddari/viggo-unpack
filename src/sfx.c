@@ -69,26 +69,25 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     return NULL;
   }
 
-  u32 elements;
-  READ_LE(sfx_file, elements);
-  VagpAudio** container = malloc((elements + 1) * sizeof *container);
+  struct {
+    u32 elements;
+    u32 *addresses;
+    u32 *sizes;
+  } sfx_info;
 
-  u32 *vagp_info = malloc(2 * elements * sizeof *vagp_info);
-  for (u32 i = 0; i < 2 * elements; i += 2) {
-    READ_LE(sfx_file, vagp_info[i]);
-    READ_LE(sfx_file, vagp_info[i + 1]);
+  READ_LE(sfx_file, sfx_info.elements);
+  sfx_info.addresses = malloc(sfx_info.elements * sizeof *sfx_info.addresses);
+  sfx_info.sizes = malloc(sfx_info.elements * sizeof *sfx_info.sizes);
+
+  fprintf(stderr, "Discovered %u addresses at:\n", sfx_info.elements);
+  for (u32 i = 0; i < sfx_info.elements; i++) {
+    READ_LE(sfx_file, sfx_info.addresses[i]);
+    READ_LE(sfx_file, sfx_info.sizes[i]);
+    fprintf(stderr, "addr=0x%.8X; size=0x%.8X\n", sfx_info.addresses[i], sfx_info.sizes[i]);
   }
 
-  fprintf(stderr, "Discovered %u addresses at:\n", elements);
-  for (u32 i = 0; i < 2 * elements; i += 2) {
-    fprintf(stderr, "addr=0x%.4X, size=0x%.4X\n", vagp_info[i], vagp_info[i + 1]);
-  }
-
-  // TODO(raddari): find a use for the info table
-  free(vagp_info);
-  vagp_info = NULL;
-
-  for (u32 i = 0; i < elements; i++) {
+  VagpAudio** container = malloc((sfx_info.elements + 1) * sizeof *container);
+  for (u32 i = 0; i < sfx_info.elements; i++) {
     VagpAudio *audio = malloc(sizeof *audio);
     audio->header = parse_vagp_header(sfx_file);
 
@@ -102,7 +101,11 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     }
     container[i] = audio;
   }
-  container[elements] = NULL;
+
+  free(sfx_info.addresses);
+  free(sfx_info.sizes);
+
+  container[sfx_info.elements] = NULL;
   return container;
 }
 
