@@ -36,7 +36,6 @@
 #define READ_LE(file, target) READ_ONE(file, target)
 
 
-static bool compare_magic(const u8 *restrict lhs, const u8 *restrict rhs, size_t size);
 static AifHeader parse_vagp_header(FILE *file);
 static AifBlock* parse_aif_block(FILE *file);
 
@@ -56,7 +55,17 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
   u8 buffer[4];
   READ_ARRAY(sfx_file, buffer, sizeof buffer);
 
-  if (!compare_magic(SFX_MAGIC, buffer, sizeof buffer)) {
+  if (memcmp(SFX_MAGIC, buffer, sizeof buffer) != 0) {
+    u32 buffer_size = sizeof buffer;
+    fprintf(stderr, "Malformed magic bytes. Expected: ");
+    for (u32 i = 0; i < buffer_size; i++) {
+      fprintf(stderr, "0x%.2X ", SFX_MAGIC[i]);
+    }
+    fprintf(stderr, "; Got: ");
+    for (u32 i = 0; i < buffer_size; i++) {
+      fprintf(stderr, "0x%.2X", buffer[i]);
+    }
+    fprintf(stderr, "\n");
     return NULL;
   }
 
@@ -113,22 +122,6 @@ void sfx_container_destroy(VagpAudio **container) {
     container[i] = NULL;
   }
   free(container);
-}
-
-static bool compare_magic(const u8 *restrict lhs, const u8 *restrict rhs, size_t size) {
-  if (memcmp(lhs, rhs, size) != 0) {
-    fprintf(stderr, "Malformed magic bytes. Expected: ");
-    for (u32 i = 0; i < size; i++) {
-      fprintf(stderr, "0x%.2X ", lhs[i]);
-    }
-    fprintf(stderr, "; Got: ");
-    for (u32 i = 0; i < size; i++) {
-      fprintf(stderr, "0x%.2X", rhs[i]);
-    }
-    fprintf(stderr, "\n");
-    return false;
-  }
-  return true;
 }
 
 static AifHeader parse_vagp_header(FILE *file) {
