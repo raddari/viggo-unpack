@@ -94,7 +94,7 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     AifBlock *block = parse_aif_block(sfx_file);
     audio->first = block;
 
-    while (memcmp(AIF_BLOCK_END, block, sizeof *block) != 0) {
+    while (memcmp(AIF_BLOCK_END, block, sizeof AIF_BLOCK_END) != 0) {
       AifBlock *next = parse_aif_block(sfx_file);
       block->next = next;
       block = next;
