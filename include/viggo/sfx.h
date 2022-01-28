@@ -25,7 +25,7 @@ typedef struct AifBlock {
 } AifBlock;
 
 typedef struct VagpAudio {
-  AifHeader header;
+  AifHeader *header;
   AifBlock *first;
 } VagpAudio;
 

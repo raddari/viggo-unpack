@@ -36,7 +36,7 @@
 #define READ_LE(file, target) READ_ONE(file, target)
 
 
-static AifHeader parse_vagp_header(FILE *file);
+static AifHeader* parse_vagp_header(FILE *file);
 static AifBlock* parse_aif_block(FILE *file);
 
 static const u8 SFX_MAGIC[4] = {0x46, 0x46, 0x46, 0x58};
@@ -121,24 +121,25 @@ void sfx_container_destroy(VagpAudio **container) {
       free(block);
       block = next;
     }
+    free(container[i]->header);
     free(container[i]);
     container[i] = NULL;
   }
   free(container);
 }
 
-static AifHeader parse_vagp_header(FILE *file) {
-  AifHeader header = {0};
+static AifHeader* parse_vagp_header(FILE *file) {
+  AifHeader *header = malloc(sizeof *header);
 
-  READ_ARRAY(file, header.magic, 4);
-  READ_BE(file, header.version);
-  READ_BE(file, header.offset);
-  READ_BE(file, header.size);
-  READ_BE(file, header.rate);
-  READ_ARRAY(file, header._r0, 10);
-  READ_BE(file, header.channels);
-  READ_BE(file, header._r1);
-  READ_ARRAY(file, header.title, 32);
+  READ_ARRAY(file, header->magic, 4);
+  READ_BE(file, header->version);
+  READ_BE(file, header->offset);
+  READ_BE(file, header->size);
+  READ_BE(file, header->rate);
+  READ_ARRAY(file, header->_r0, 10);
+  READ_BE(file, header->channels);
+  READ_BE(file, header->_r1);
+  READ_ARRAY(file, header->title, 32);
 
   return header;
 }

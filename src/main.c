@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   VagpAudio** container = sfx_parse_container(file);
   for (int i = 0; container[i] != NULL; i++) {
     VagpAudio* audio = container[i];
-    print_header(&audio->header);
+    print_header(audio->header);
     printf("\n");
   }
   sfx_container_destroy(container);
