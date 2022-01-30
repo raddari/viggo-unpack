@@ -1,5 +1,7 @@
 #include "sfx.h"
 
+#include "logger.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,12 +13,11 @@
     {                                                                \
       size_t nread = fread((target), sizeof *(target), (n), (file)); \
       if (nread < (n)) {                                             \
-        fprintf(stderr, "%s:%d: ", __FILE__, __LINE__);              \
         if (feof(file)) {                                            \
-          fprintf(stderr, "End of file reading " #target "\n");      \
+          WARN("End of file reading " #target);                      \
         }                                                            \
         if (ferror(file)) {                                          \
-          fprintf(stderr, "Error reading " #target "\n");            \
+          WARN("Error reading " #target);                            \
         }                                                            \
       }                                                              \
     }
@@ -57,15 +58,14 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
 
   if (memcmp(SFX_MAGIC, buffer, sizeof buffer) != 0) {
     u32 buffer_size = sizeof buffer;
-    fprintf(stderr, "Malformed magic bytes. Expected: ");
+    ERROR("Malformed magic bytes. Expected:");
     for (u32 i = 0; i < buffer_size; i++) {
-      fprintf(stderr, "0x%.2X ", SFX_MAGIC[i]);
+      ERROR("0x%.2X ", SFX_MAGIC[i]);
     }
-    fprintf(stderr, "; Got: ");
+    ERROR("Got:");
     for (u32 i = 0; i < buffer_size; i++) {
-      fprintf(stderr, "0x%.2X", buffer[i]);
+      ERROR("0x%.2X", buffer[i]);
     }
-    fprintf(stderr, "\n");
     return NULL;
   }
 
@@ -79,11 +79,11 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
   sfx_info.addresses = malloc(sfx_info.elements * sizeof *sfx_info.addresses);
   sfx_info.sizes = malloc(sfx_info.elements * sizeof *sfx_info.sizes);
 
-  fprintf(stderr, "Discovered %u addresses at:\n", sfx_info.elements);
+  DEBUG("Discovered %u addresses at:", sfx_info.elements);
   for (u32 i = 0; i < sfx_info.elements; i++) {
     READ_LE(sfx_file, sfx_info.addresses[i]);
     READ_LE(sfx_file, sfx_info.sizes[i]);
-    fprintf(stderr, "addr=0x%.8X; size=0x%.8X\n", sfx_info.addresses[i], sfx_info.sizes[i]);
+    DEBUG("addr=0x%.8X; size=0x%.8X", sfx_info.addresses[i], sfx_info.sizes[i]);
   }
 
   VagpAudio** container = malloc((sfx_info.elements + 1) * sizeof *container);

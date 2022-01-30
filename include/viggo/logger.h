@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <string.h>
 
 
 #define LOG_LEVEL_ERROR 0
@@ -10,11 +11,12 @@
 #define LOG_LEVEL_TRACE 4
 
 #ifndef LOG_SILENCE
-  #define LOG_FILE(file, prefix, level, msg, ...)                                         \
-      {                                                                                   \
-        if (log_get_level() >= level) {                                                   \
-          fprintf(file, prefix " (%s:%d) " msg "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
-        }                                                                                 \
+  #define LOG_FILE(file, prefix, level, msg, ...)                   \
+      {                                                             \
+        if (logger_get_level() >= level) {                          \
+          fprintf(file, prefix " (%s:%d) " msg "\n",                \
+              strrchr(__FILE__, '/') + 1, __LINE__, ##__VA_ARGS__); \
+        }                                                           \
       }
 #else
   #define LOG_FILE(file, prefix, level, msg, ...)
@@ -29,5 +31,5 @@
 #define TRACE(msg, ...) LOG_MESSAGE("[TRACE]", LOG_LEVEL_TRACE, msg, ##__VA_ARGS__)
 
 
-int log_get_level();
-void log_set_level(int log_level);
+int logger_get_level();
+void logger_set_level(int log_level);

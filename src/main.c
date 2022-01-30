@@ -1,3 +1,4 @@
+#include "logger.h"
 #include "sfx.h"
 
 #include <stdio.h>
@@ -7,6 +8,8 @@ static void print_header(AifHeader *header);
 
 
 int main(int argc, char *argv[]) {
+  logger_set_level(LOG_LEVEL_TRACE);
+
   if (argc != 2) {
     fprintf(stderr, "Please supply file path\n");
     return 1;
