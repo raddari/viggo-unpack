@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
   FILE *file = fopen(argv[1], "rb");
   if (!file) {
-    fprintf(stderr, "Cannot open file\n");
+    fprintf(stderr, "Cannot open file: %s\n", argv[1]);
     return 1;
   }
 
