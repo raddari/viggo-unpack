@@ -9,11 +9,12 @@ typedef struct AifHeader {
   char magic[4];
   u32 version;
   u32 offset;
-  u32 size;
+  u16 flags;
+  u8 _r0[2];
   u32 rate;
-  u8 _r0[10];
+  u8 _r1[10];
   u8 channels;
-  u8 _r1;
+  u8 _r2[1];
   char title[32];
 } AifHeader;
 

@@ -39,16 +39,16 @@ static void print_header(AifHeader *header) {
     return;
   }
 
-  printf("AifHeader{\n"
+  printf("AifHeader {\n"
       "  magic=%s\n"
       "  version=%u\n"
       "  offset=%u\n"
-      "  size=%u\n"
+      "  flags=%u\n"
       "  rate=%u\n"
       "  channels=%u\n"
       "  title=%s\n"
       "}\n",
       header->magic, header->version, header->offset,
-      header->size, header->rate, header->channels,
+      header->flags, header->rate, header->channels,
       header->title);
 }

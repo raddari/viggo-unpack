@@ -27,10 +27,14 @@
 #define READ_ONE(file, target) READ_N(file, &target, 1)
 
 // FIXME(raddari): not portable (#2)
-#define READ_BE(file, target) \
-    {                         \
-      READ_ONE(file, target); \
-      target = htonl(target); \
+#define READ_BE(file, target)              \
+    {                                      \
+      READ_ONE(file, target);              \
+      if (sizeof target == sizeof (u16)) { \
+        target = htons(target);            \
+      } else {                             \
+        target = htonl(target);            \
+      }                                    \
     }
 
 // FIXME(raddari): not portable (#2)
@@ -134,11 +138,12 @@ static AifHeader* parse_vagp_header(FILE *file) {
   READ_ARRAY(file, header->magic, 4);
   READ_BE(file, header->version);
   READ_BE(file, header->offset);
-  READ_BE(file, header->size);
+  READ_BE(file, header->flags);
+  READ_ARRAY(file, header->_r0, 2);
   READ_BE(file, header->rate);
-  READ_ARRAY(file, header->_r0, 10);
+  READ_ARRAY(file, header->_r1, 10);
   READ_BE(file, header->channels);
-  READ_BE(file, header->_r1);
+  READ_ARRAY(file, header->_r2, 1);
   READ_ARRAY(file, header->title, 32);
 
   return header;
