@@ -88,13 +88,13 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     audio->header = parse_vagp_header(sfx_file);
 
     u32 block_size = sfx_info.sizes[i] - sizeof (AifHeader);
-    u32 blocks_remaining = (block_size / (sizeof (AifBlock) - sizeof (AifBlock *))) - 1;
+    u32 blocks_remaining = block_size / (sizeof (AifBlock) - sizeof (AifBlock *));
     DEBUG("block_size=%u, blocks_remaining=%u", block_size, blocks_remaining);
 
     AifBlock *block = parse_aif_block(sfx_file);
     audio->first = block;
 
-    while (blocks_remaining-- > 0) {
+    while (--blocks_remaining > 0) {
       AifBlock *next = parse_aif_block(sfx_file);
       block->next = next;
       block = next;
