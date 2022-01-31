@@ -40,11 +40,7 @@
 static AifHeader* parse_vagp_header(FILE *file);
 static AifBlock* parse_aif_block(FILE *file);
 
-static const u8 SFX_MAGIC[4] = {0x46, 0x46, 0x46, 0x58};
-static const u8 AIF_BLOCK_END[16] = {
-    0x07, 0x00, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-    0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
-};
+static const u8 SFX_MAGIC[4] = {0x46, 0x46, 0x46, 0x58}; // FFFX
 
 
 VagpAudio** sfx_parse_container(FILE *sfx_file) {
@@ -91,10 +87,14 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     VagpAudio *audio = malloc(sizeof *audio);
     audio->header = parse_vagp_header(sfx_file);
 
+    u32 block_size = sfx_info.sizes[i] - sizeof (AifHeader);
+    u32 blocks_remaining = (block_size / (sizeof (AifBlock) - sizeof (AifBlock *))) - 1;
+    DEBUG("block_size=%u, blocks_remaining=%u", block_size, blocks_remaining);
+
     AifBlock *block = parse_aif_block(sfx_file);
     audio->first = block;
 
-    while (memcmp(AIF_BLOCK_END, block, sizeof AIF_BLOCK_END) != 0) {
+    while (blocks_remaining-- > 0) {
       AifBlock *next = parse_aif_block(sfx_file);
       block->next = next;
       block = next;
