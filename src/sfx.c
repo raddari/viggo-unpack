@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// FIXME(raddari): `arpa/inet.h` is not portable (#1)
 #include <arpa/inet.h>
 
 #define READ_N(file, target, n)                                      \
