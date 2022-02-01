@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "sfx.h"
 
+#include <errno.h>
 #include <stdio.h>
 
 
@@ -17,7 +18,7 @@ int main(int argc, char *argv[]) {
 
   FILE *file = fopen(argv[1], "rb");
   if (!file) {
-    fprintf(stderr, "Cannot open file: %s\n", argv[1]);
+    perror("Error opening file");
     return 1;
   }
 
