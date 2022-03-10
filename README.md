@@ -1,4 +1,6 @@
 # viggo-unpack
+![license_badge](https://img.shields.io/github/license/raddari/viggo-unpack)
+
 Unpacker for Fur Fighter's: Viggo's Revenge (PS2) files
 
 ## Goals
