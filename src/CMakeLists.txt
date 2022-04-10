@@ -1,4 +1,8 @@
 target_sources(${UNPACKER_EXE} PRIVATE
-  main.c
   logger.c
-  sfx.c)
+  logger.h
+  main.c
+  sfx.c
+  sfx.h
+  types.h
+)

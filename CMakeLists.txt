@@ -11,8 +11,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(radian)
 
 add_executable(${UNPACKER_EXE})
-target_include_directories(${UNPACKER_EXE} PRIVATE
-  ${CMAKE_SOURCE_DIR}/include/viggo)
 target_link_libraries(${UNPACKER_EXE} PRIVATE
   radian::radian)
 
