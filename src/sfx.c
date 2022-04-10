@@ -1,43 +1,11 @@
 #include "sfx.h"
 
 #include "logger.h"
+#include "radian/radian.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <arpa/inet.h>
-
-#define READ_N(file, target, n)                                      \
-    {                                                                \
-      size_t nread = fread((target), sizeof *(target), (n), (file)); \
-      if (nread < (n)) {                                             \
-        if (feof(file)) {                                            \
-          WARN("End of file reading " #target);                      \
-        }                                                            \
-        if (ferror(file)) {                                          \
-          WARN("Error reading " #target);                            \
-        }                                                            \
-      }                                                              \
-    }
-
-#define READ_ARRAY(file, target, n) READ_N(file, target, n)
-
-#define READ_ONE(file, target) READ_N(file, &target, 1)
-
-// FIXME(raddari): not portable (#2)
-#define READ_BE(file, target)              \
-    {                                      \
-      READ_ONE(file, target);              \
-      if (sizeof target == sizeof (u16)) { \
-        target = htons(target);            \
-      } else {                             \
-        target = htonl(target);            \
-      }                                    \
-    }
-
-// FIXME(raddari): not portable (#2)
-#define READ_LE(file, target) READ_ONE(file, target)
 
 
 static AifHeader* parse_vagp_header(FILE *file);
@@ -53,7 +21,7 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
 
   fseek(sfx_file, 0, SEEK_SET);
   u8 buffer[4];
-  READ_ARRAY(sfx_file, buffer, sizeof buffer);
+  RADIAN_READ_MANY(sfx_file, buffer, sizeof buffer);
 
   if (memcmp(SFX_MAGIC, buffer, sizeof buffer) != 0) {
     u32 buffer_size = sizeof buffer;
@@ -74,14 +42,14 @@ VagpAudio** sfx_parse_container(FILE *sfx_file) {
     u32 *sizes;
   } sfx_info;
 
-  READ_LE(sfx_file, sfx_info.elements);
+  RADIAN_READ_LE(sfx_file, sfx_info.elements);
   sfx_info.addresses = malloc(sfx_info.elements * sizeof *sfx_info.addresses);
   sfx_info.sizes = malloc(sfx_info.elements * sizeof *sfx_info.sizes);
 
   DEBUG("Discovered %u addresses at:", sfx_info.elements);
   for (u32 i = 0; i < sfx_info.elements; i++) {
-    READ_LE(sfx_file, sfx_info.addresses[i]);
-    READ_LE(sfx_file, sfx_info.sizes[i]);
+    RADIAN_READ_LE(sfx_file, sfx_info.addresses[i]);
+    RADIAN_READ_LE(sfx_file, sfx_info.sizes[i]);
     DEBUG("addr=0x%.8X; size=0x%.8X", sfx_info.addresses[i], sfx_info.sizes[i]);
   }
 
@@ -134,16 +102,16 @@ void sfx_container_destroy(VagpAudio **container) {
 static AifHeader* parse_vagp_header(FILE *file) {
   AifHeader *header = malloc(sizeof *header);
 
-  READ_ARRAY(file, header->magic, 4);
-  READ_BE(file, header->version);
-  READ_BE(file, header->offset);
-  READ_BE(file, header->flags);
-  READ_ARRAY(file, header->_r0, 2);
-  READ_BE(file, header->rate);
-  READ_ARRAY(file, header->_r1, 10);
-  READ_BE(file, header->channels);
-  READ_ARRAY(file, header->_r2, 1);
-  READ_ARRAY(file, header->title, 32);
+  RADIAN_READ_MANY(file, header->magic, 4);
+  RADIAN_READ_BE(file, header->version);
+  RADIAN_READ_BE(file, header->offset);
+  RADIAN_READ_BE(file, header->flags);
+  RADIAN_READ_MANY(file, header->_r0, 2);
+  RADIAN_READ_BE(file, header->rate);
+  RADIAN_READ_MANY(file, header->_r1, 10);
+  RADIAN_READ_BE(file, header->channels);
+  RADIAN_READ_MANY(file, header->_r2, 1);
+  RADIAN_READ_MANY(file, header->title, 32);
 
   return header;
 }
@@ -152,9 +120,9 @@ static AifBlock* parse_aif_block(FILE *file) {
   AifBlock *block = malloc(sizeof *block);
   block->next = NULL;
 
-  READ_LE(file, block->coefficient);
-  READ_LE(file, block->loop);
-  READ_ARRAY(file, block->data, 14);
+  RADIAN_READ_LE(file, block->coefficient);
+  RADIAN_READ_LE(file, block->loop);
+  RADIAN_READ_MANY(file, block->data, 14);
 
   return block;
 }
