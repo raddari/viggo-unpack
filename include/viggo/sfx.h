@@ -30,6 +30,25 @@ typedef struct VagpAudio {
   AifBlock *first;
 } VagpAudio;
 
+typedef enum {
+  AifFlag0 = 1u << 0,
+  AifFlag1 = 1u << 1,
+  AifFlag2 = 1u << 2,
+  AifFlag3 = 1u << 3,
+  AifFlag4 = 1u << 4,
+  AifFlag5 = 1u << 5,
+  AifFlag6 = 1u << 6,
+  AifFlag7 = 1u << 7,
+  AifFlag8 = 1u << 8,
+  AifFlag9 = 1u << 9,
+  AifFlagA = 1u << 10,
+  AifFlagB = 1u << 11,
+  AifFlagC = 1u << 12,
+  AifFlagD = 1u << 13,
+  AifFlagE = 1u << 14,
+  AifFlagF = 1u << 15,
+} AifFlags;
+
 
 /// Produces a NULL-terminated array of `VagpAudio` structs
 /// decoded from the given SFX file. This function may return
